@@ -1,1 +1,11 @@
-select n.n_name, count(o_orderkey) from ORDERS o join CUSTOMER c on o.o_custkey = c.c_custkey join NATION n on n.n_nationkey = c.c_nationkey group by n.n_name order by count(o_orderkey) desc;
+select
+    n.n_name,
+    count(o.o_orderkey)
+from
+    CUSTOMER c
+    left join ORDERS o on c.c_custkey = o.o_custkey
+    right join NATION n on c.c_nationkey = n.n_nationkey
+group by
+    n.n_name
+order by
+    count(o.o_orderkey) desc;

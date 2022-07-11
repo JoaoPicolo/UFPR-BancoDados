@@ -1,1 +1,4 @@
-select distinct(o_orderstatus) from ORDERS;
+select
+    distinct(o_orderstatus)
+from
+    ORDERS;

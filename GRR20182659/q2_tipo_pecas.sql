@@ -1,1 +1,4 @@
-select distinct(p_type) from PART;
+select
+    distinct(p_type)
+from
+    PART;
