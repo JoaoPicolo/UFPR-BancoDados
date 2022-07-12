@@ -1,6 +1,6 @@
 select
     n.n_name,
-    count(l.l_orderkey)
+    sum(l.l_quantity)
 from
     CUSTOMER c
     left join ORDERS o on c.c_custkey = o.o_custkey
@@ -9,6 +9,6 @@ from
 group by
     n.n_name
 order by
-    count(l.l_orderkey) desc
+    sum(l.l_quantity) desc
 limit
     10;

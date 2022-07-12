@@ -1,6 +1,6 @@
 select
     n.n_name,
-    count(l.l_orderkey)
+    sum(l.l_quantity)
 from
     ORDERS o
     join LINEITEM l on o.o_orderkey = l.l_orderkey
@@ -9,6 +9,6 @@ from
 group by
     n.n_name
 having
-    count(l.l_orderkey) > 62000
+    sum(l.l_quantity) > 62000
 order by
-    count(l.l_orderkey) desc;
+    sum(l.l_quantity) desc;
