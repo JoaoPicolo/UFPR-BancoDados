@@ -1,15 +1,20 @@
 select
-    count(c.c_custkey)
+    count(c_custkey)
 from
-    CUSTOMER c
-where
-    not exists (
+    (
         select
-            *
+            c.c_custkey
         from
-            ORDERS o
+            CUSTOMER c
+            join ORDERS o on c.c_custkey = o.o_custkey
         where
-            c.c_custkey = o.o_custkey
-            and o.o_comment not like '%special request%'
-            and o.o_comment like '%unusual package%'
+            o.o_comment like '%special request%'
+        except
+        select
+            c.c_custkey
+        from
+            CUSTOMER c
+            join ORDERS o on c.c_custkey = o.o_custkey
+        where
+            o.o_comment like '%unusual package%'
     );
