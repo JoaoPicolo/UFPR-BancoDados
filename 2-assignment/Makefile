@@ -1,0 +1,23 @@
+CC     = g++
+CFLAGS = -Wall -O3
+LFLAGS = 
+
+PROG = escalona 
+OBJS = graph.o
+
+.PHONY: limpa faxina clean purge all
+
+all: escalona
+
+%.o: %.cpp %.hpp
+	$(CC) -c $(CFLAGS) $<
+
+$(PROG) : % :  $(OBJS) %.o
+	$(CC) -o $@ $^ $(LFLAGS)
+
+faxina purge:
+	@rm -f *~ *.bak
+
+limpa clean:   faxina
+	@rm -f *.o core a.out
+	@rm -f $(PROG)
