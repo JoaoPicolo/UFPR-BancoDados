@@ -3,9 +3,12 @@
 
 using namespace std;
 
-struct node_t {
+struct transaction_t {
     int arrival_time, identifier;
-    string operation, attribute;
+    char operation, attribute;
 };
 
-void test(string line);
+transaction_t createTransaction(
+    int arrival_time, int identifier,
+    char operation, char attribute
+);

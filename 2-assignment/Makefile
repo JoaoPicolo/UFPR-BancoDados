@@ -3,7 +3,7 @@ CFLAGS = -Wall -O3
 LFLAGS = 
 
 PROG = escalona 
-OBJS = graph.o processing.o
+OBJS = graph.o
 
 .PHONY: limpa faxina clean purge all
 
