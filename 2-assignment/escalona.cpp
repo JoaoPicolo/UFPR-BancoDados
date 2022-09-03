@@ -13,23 +13,34 @@ int main() {
 
     // Lista de adjacência para construção do grafo
     vector<nodo_t> adj;
+    int count = 1;
     while (scanf("%d %d %c %c", &arrival_time, &identifier, &operation, &attribute) != EOF) {
-        cout << "\nLeu novo" << endl;
+        //cout << "\nLeu novo" << endl;
         transaction_t tx = createTransaction(arrival_time, identifier, operation, attribute);
         bool finished = updateAdj(adj, tx);
-        cout << "antes: " << endl;
-        for (auto ad: adj) {
-            cout << ad.adjTx.size();
-            cout << endl;
-        }
+
         if (finished) {
-            //cout << "Roda dfs" << hasCycle(adj) << endl;
-            cout << "depois: " << endl;
-            for (auto ad: adj) {
-                cout << ad.adjTx.size();
-                cout << endl;
+            cout << count << " ";
+
+            int size = adj.size();
+            for (int i = 0; i < size; i++) {
+                cout << adj[i].id;
+
+                if (i < size - 1) {
+                    cout << ",";
+                }
+            }
+
+            if (hasCycle(adj)) {
+                cout << " NS ";
+            }
+            else {
+                cout << " SS ";
             }
             
+            cout << endl;
+
+            count++;
             adj.clear();
         }
     }
