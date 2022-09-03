@@ -2,34 +2,40 @@
 #include <iostream>
 #include <set>
 #include <list>
+#include <vector>
 
 using namespace std;
 
-struct transaction_t {
-    int arrival_time, identifier;
-    char operation, attribute;
+struct operation_t {
+    char type, attr;
 };
 
-struct attribute_t {
-    int idTx;
-    char attribute;
+struct transaction_t {
+    int time, id;
+    operation_t operation;
 };
 
 struct nodo_t {
     int id;
-    char op;
-    char attr;
-    int commited;
-    std::list<int> adjList;
+    bool commit;
+    vector<operation_t> operations;
+    vector<int> adjTx;
 };
+
+//struct attribute_t {
+//    int idTx;
+//    char attribute;
+//};
 
 transaction_t createTransaction(
     int arrival_time, int identifier,
     char operation, char attribute
 );
 
-void appendAttr(
-    list<attribute_t> attrList,
-    int idTx,
-    char attr
-);
+//void appendAttr(
+//    list<attribute_t> attrList,
+//    int idTx,
+//    char attr
+//);
+
+void updateAdj(vector<nodo_t> &adj, transaction_t tx);

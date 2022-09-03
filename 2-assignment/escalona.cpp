@@ -12,12 +12,19 @@ int main() {
     //std::list<attribute_t> attr;
 
     // Lista de adjacência para construção do grafo
-    std::list<nodo_t> adj;
-
+    vector<nodo_t> adj;
     while (scanf("%d %d %c %c", &arrival_time, &identifier, &operation, &attribute) != EOF) {
+        cout << "\n\n\nLeu novo" << endl;
         transaction_t tx = createTransaction(arrival_time, identifier, operation, attribute);
-        cout << tx.arrival_time << " " << tx.identifier << " " << tx.operation << " " << tx.attribute << endl;
+        updateAdj(adj, tx);
+    }
 
-        //appendAttr(attr, identifier, attribute);
+    for (auto ad: adj) {
+        cout << ad.id << ": ";
+        vector<int> adjss = ad.adjTx;
+        for (auto aa: adjss) {
+            cout << aa << " ";
+        }
+        cout << endl;
     }
 }
