@@ -17,10 +17,16 @@ int main() {
         cout << "\nLeu novo" << endl;
         transaction_t tx = createTransaction(arrival_time, identifier, operation, attribute);
         bool finished = updateAdj(adj, tx);
+        cout << "antes: " << endl;
+        for (auto ad: adj) {
+            cout << ad.adjTx.size();
+            cout << endl;
+        }
         if (finished) {
-            cout << "Roda dfs" << hasCycle(adj) << endl;
+            //cout << "Roda dfs" << hasCycle(adj) << endl;
+            cout << "depois: " << endl;
             for (auto ad: adj) {
-                cout << ad.id;
+                cout << ad.adjTx.size();
                 cout << endl;
             }
             

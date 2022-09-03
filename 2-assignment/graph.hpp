@@ -20,7 +20,7 @@ struct nodo_t {
     bool commit;
     bool visited;
     vector<operation_t> operations;
-    set<nodo_t*> adjTx;
+    set<int> adjTx;
 };
 
 //struct attribute_t {

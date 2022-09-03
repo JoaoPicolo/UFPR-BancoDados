@@ -82,24 +82,25 @@ bool updateAdj(vector<nodo_t> &adj, transaction_t tx) {
     }
     
     for (auto &item: adj) {
-        //cout << "Compara " << tx.id << " com " << item.id << endl;
+        cout << "Compara " << tx.id << " com " << item.id << endl;
         if (item.id == tx.id) {
-            //cout << "Adiciona operacao " << tx.operation.type << endl;
+            cout << "Adiciona operacao " << tx.operation.type << endl;
             item.operations.push_back(tx.operation);
         }
         else {
-            //cout << "Verifica operacao" << endl;
+            cout << "Verifica operacao" << endl;
             vector<operation_t> operations = item.operations;
             for (auto op: operations) {
                 if (op.attr == tx.operation.attr) {
-                    //cout << "Operacao eh " << op.type << " e " << tx.operation.type << endl;
+                    cout << "Operacao eh " << op.type << " e " << tx.operation.type << endl;
                     if (
                         (op.type == 'R' && tx.operation.type == 'W') ||
                         (op.type == 'W' && tx.operation.type == 'R') ||
                         (op.type == 'W' && tx.operation.type == 'W')
                     ) {
                         cout << "Vai adicionar " << item.id << " em " << node->id << endl;
-                        node->adjTx.insert(&item);
+                        (node->adjTx).insert(item.id);
+
                     }
                 }
             }
@@ -109,7 +110,7 @@ bool updateAdj(vector<nodo_t> &adj, transaction_t tx) {
     return false;
 }
 
-bool visitNode(nodo_t *node) {
+/* bool visitNode(nodo_t *node) {
     if (node->visited) {
         return true;
     }
@@ -121,12 +122,66 @@ bool visitNode(nodo_t *node) {
     }
 
     return false;
+} */
+
+
+
+int index(vector<nodo_t> adj, int id) {
+
+    int size = adj.size();
+    for (int i = 0; i < size; i++) {
+        if (adj[i].id == id)
+            return i;
+    }
+
+    return 0;
+    
+}
+
+/* bool isCyclicUtil(vector<nodo_t> adj, vector<bool> &visited, int current) {
+
+    if (visited[current])
+        return true;
+    
+    visited[current] = true;
+    bool flag = false;
+
+    set<int>::iterator it;
+
+    for(it = adj[current].adjTx.begin(); it != adj[current].adjTx.end(); it++) {
+        int currentIndex = index(adj, (*it));
+        cout << "Trx: " << (*it) << " index: " << currentIndex << endl;
+        flag = isCyclicUtil(adj, visited, currentIndex);
+
+        if (flag) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 bool hasCycle(vector<nodo_t> adj) {
     vector<bool> visited(adj.size(), false);
+    set<int>::iterator it;
+
+    bool flag = false;
     
-    for (int i = 0; i < adj.size(); i++) {
+    int size = adj.size();
+    for (int i = 0; i < size; i++) {
+        visited[i] = true;
+    
+        for(it = adj[i].adjTx.begin(); it != adj[i].adjTx.end(); it++) {
+            int currentIndex = index(adj, (*it));
+            cout << "Trx: " << (*it) << " index: " << currentIndex << endl;
+            flag = isCyclicUtil(adj, visited, currentIndex);
+
+            if (flag) {
+                return true;
+            }
+        }
+        visited[i] = false;
+
         if (!visited[i]) {
             if (isCyclic(i, visited, -1)) {
                 return true;
@@ -135,4 +190,4 @@ bool hasCycle(vector<nodo_t> adj) {
     }
 
     return false;
-}
+} */
