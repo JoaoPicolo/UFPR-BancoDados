@@ -36,26 +36,23 @@ transaction_t createTransaction(
 //}
 
 
-nodo_t findTx(int id, vector<nodo_t> &adj) {
-    nodo_t node;
-    cout << "Criou " << &node << endl;
-    node.id = -1;
-
-    for (auto tx: adj) {
+nodo_t* findTx(int id, vector<nodo_t> &adj) {
+    for (auto &tx: adj) {
         if (tx.id == id) {
-            cout << "Achou " << &tx << endl;
-            return tx;
+            return &tx;
         }
     }
 
-    return node;
+    return NULL;
 }
 
 
-nodo_t createTx(transaction_t tx) {
-    nodo_t node;
-    node.id = tx.id;
-    node.commit = false;
+nodo_t* createTx(transaction_t tx) {
+    nodo_t* node = (nodo_t*)malloc(sizeof(nodo_t));
+    node->id = tx.id;
+    node->commit = false;
+    node->visited = false;
+    node->adjTx = {};
 
     return node;
 }
@@ -72,48 +69,70 @@ bool transactionsClosed(vector<nodo_t> adj) {
 }
 
 
-void updateAdj(vector<nodo_t> &adj, transaction_t tx) {
-    nodo_t node = findTx(tx.id, adj);
-    if (node.id == -1) {
+bool updateAdj(vector<nodo_t> &adj, transaction_t tx) {
+    nodo_t* node = findTx(tx.id, adj);
+    if (node == NULL) {
         node = createTx(tx);
-        adj.push_back(node);
+        adj.push_back(*node);
     }
-    cout << "Endereco usado eh " << &node << endl;
 
     if (tx.operation.type == 'C') {
-        node.commit = true;
-        if (transactionsClosed(adj)) {
-            cout << "Transacoes acabaram" << endl;
-        }
-        else {
-            cout << "Transacoes nao acabaram" << endl;
-        }
-
-        return;
+        node->commit = true;
+        return transactionsClosed(adj);
     }
     
     for (auto &item: adj) {
-        cout << "Compara " << tx.id << " com " << item.id << endl;
+        //cout << "Compara " << tx.id << " com " << item.id << endl;
         if (item.id == tx.id) {
-            cout << "Adiciona operacao " << tx.operation.type << endl;
+            //cout << "Adiciona operacao " << tx.operation.type << endl;
             item.operations.push_back(tx.operation);
         }
         else {
-            cout << "Verifica operacao" << endl;
+            //cout << "Verifica operacao" << endl;
             vector<operation_t> operations = item.operations;
             for (auto op: operations) {
                 if (op.attr == tx.operation.attr) {
-                    cout << "Operacao eh " << op.type << " e " << tx.operation.type << endl;
+                    //cout << "Operacao eh " << op.type << " e " << tx.operation.type << endl;
                     if (
                         (op.type == 'R' && tx.operation.type == 'W') ||
                         (op.type == 'W' && tx.operation.type == 'R') ||
                         (op.type == 'W' && tx.operation.type == 'W')
                     ) {
-                        cout << "Vai adicionar " << item.id << " em " << node.id << endl;
-                        node.adjTx.push_back(item.id);
+                        cout << "Vai adicionar " << item.id << " em " << node->id << endl;
+                        node->adjTx.insert(&item);
                     }
                 }
             }
         }
     }
+
+    return false;
+}
+
+bool visitNode(nodo_t *node) {
+    if (node->visited) {
+        return true;
+    }
+
+    node->visited = true;
+    set<nodo_t*> adjs = node->adjTx;
+    for (auto neighbour: adjs) {
+        return visitNode(neighbour);
+    }
+
+    return false;
+}
+
+bool hasCycle(vector<nodo_t> adj) {
+    vector<bool> visited(adj.size(), false);
+    
+    for (int i = 0; i < adj.size(); i++) {
+        if (!visited[i]) {
+            if (isCyclic(i, visited, -1)) {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }

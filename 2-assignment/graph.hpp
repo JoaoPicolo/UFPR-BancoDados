@@ -18,8 +18,9 @@ struct transaction_t {
 struct nodo_t {
     int id;
     bool commit;
+    bool visited;
     vector<operation_t> operations;
-    vector<int> adjTx;
+    set<nodo_t*> adjTx;
 };
 
 //struct attribute_t {
@@ -38,4 +39,6 @@ transaction_t createTransaction(
 //    char attr
 //);
 
-void updateAdj(vector<nodo_t> &adj, transaction_t tx);
+bool updateAdj(vector<nodo_t> &adj, transaction_t tx);
+
+bool hasCycle(vector<nodo_t> adj);
