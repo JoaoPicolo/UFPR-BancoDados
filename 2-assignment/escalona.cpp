@@ -18,23 +18,23 @@ int main() {
         updateVisao(visao, tx);
 
         if (finished) {
-            // cout << count << " ";
+            cout << count << " ";
 
-            // int size = adj.size();
-            // for (int i = 0; i < size; i++) {
-            //     cout << adj[i].id;
+            int size = adj.size();
+            for (int i = 0; i < size; i++) {
+                cout << adj[i].id;
 
-            //     if (i < size - 1) {
-            //         cout << ",";
-            //     }
-            // }
+                if (i < size - 1) {
+                    cout << ",";
+                }
+            }
 
-            // if (hasCycle(adj)) {
-            //     cout << " NS ";
-            // }
-            // else {
-            //     cout << " SS ";
-            // }
+            if (hasCycle(adj)) {
+                cout << " NS ";
+            }
+            else {
+                cout << " SS ";
+            }
 
             if (visaoEq(visao))  {
                 cout << "SV";

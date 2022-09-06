@@ -210,41 +210,30 @@ bool validate(vector<transaction_t> arr1, vector<transaction_t> arr2) {
     return true;
 }
 
+bool heapPermutation(vector<nodo_visao_t> &a, int size) {
+    // if size becomes 1 then prints the obtained
+    // permutation
+    int isValid = true;
 
-bool permuteArrays(vector<nodo_visao_t> arr, int first) {
-    nodo_visao_t elem = arr[0];
-    arr[0] = arr[first];
-    arr[first] = elem;
-
-    int size = arr.size();
-    for (int i = 0; i < size - 1; i++) { // Defines a first array
-        vector<transaction_t> fstTxs = arr[i].transactions;
-        for (int j = i+1; j < size; j++) { // Defines a second array to compare
-            vector<transaction_t> scdTxs = arr[j].transactions;
-            bool isValid = validate(fstTxs, scdTxs);
-            
+    if (size == 1) {
+        int arraySize = a.size();
+        for (int i = 0; i < arraySize - 1; i++) {
+            cout << "Comparing " << a[i].id << " with " << a[i+1].id << ": ";
+            isValid = validate(a[i].transactions, a[i+1].transactions);
+            cout << isValid << endl;
             if (!isValid) {
                 return false;
             }
         }
-    }
 
-    return true;
-}
-
-void heapPermutation(vector<nodo_visao_t> &a, int size) {
-    // if size becomes 1 then prints the obtained
-    // permutation
-    if (size == 1) {
-        for(auto k: a) {
-            cout << k.id << " ";
-        }
-        cout << endl;
-        return;
+        return true;
     }
  
     for (int i = 0; i < size; i++) {
-        heapPermutation(a, size - 1);
+        isValid = heapPermutation(a, size - 1);
+        if (!isValid) {
+            return false;
+        }
  
         // if size is odd, swap 0th i.e (first) and
         // (size-1)th i.e (last) element
@@ -256,13 +245,14 @@ void heapPermutation(vector<nodo_visao_t> &a, int size) {
         else
             swap(a[i], a[size - 1]);
     }
+
+    return true;
+
 }
 
 
 bool visaoEq(vector<nodo_visao_t> arr) {
     int size = arr.size();
 
-    heapPermutation(arr, size);
-
-    return true;
+    return heapPermutation(arr, size);
 }
