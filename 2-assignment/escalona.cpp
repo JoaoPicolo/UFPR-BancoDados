@@ -7,17 +7,17 @@ int main() {
     int arrival_time, identifier;
     char operation, attribute;
 
-    //std::set<int> txId;
-    // Lista de atributos e a respectiva transação que o mantém
-    //std::list<attribute_t> attr;
 
     // Lista de adjacência para construção do grafo
     vector<nodo_t> adj;
+    vector<nodo_visao_t> visao;
     int count = 1;
     while (scanf("%d %d %c %c", &arrival_time, &identifier, &operation, &attribute) != EOF) {
         //cout << "\nLeu novo" << endl;
         transaction_t tx = createTransaction(arrival_time, identifier, operation, attribute);
         bool finished = updateAdj(adj, tx);
+        cout << "Aqui" << endl; 
+        updateVisao(visao, tx);
 
         if (finished) {
             cout << count << " ";
@@ -37,20 +37,19 @@ int main() {
             else {
                 cout << " SS ";
             }
+
+            // if (visaoEq(visao))  {
+            //     cout << "SV";
+            // }
+            // else {
+            //     cout << "NV";
+            // }
             
-            cout << endl;
+            // cout << endl;
 
             count++;
             adj.clear();
+            visao.clear();
         }
     }
-
-    //for (auto ad: adj) {
-    //    cout << ad.id << ": ";
-    //    vector<int> adjss = ad.adjTx;
-    //    for (auto aa: adjss) {
-    //        cout << aa << " ";
-    //    }
-    //    cout << endl;
-    //}
 }

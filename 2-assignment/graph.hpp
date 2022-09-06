@@ -23,22 +23,22 @@ struct nodo_t {
     set<int> adjTx;
 };
 
-//struct attribute_t {
-//    int idTx;
-//    char attribute;
-//};
+struct nodo_visao_t {
+    int id;
+    vector<transaction_t> transactions;
+};
 
 transaction_t createTransaction(
     int arrival_time, int identifier,
     char operation, char attribute
 );
 
-//void appendAttr(
-//    list<attribute_t> attrList,
-//    int idTx,
-//    char attr
-//);
 
 bool updateAdj(vector<nodo_t> &adj, transaction_t tx);
 
 bool hasCycle(vector<nodo_t> adj);
+
+void updateVisao(vector<nodo_visao_t> &arr, transaction_t tx);
+
+bool visaoEq(vector<nodo_visao_t> arr);
+

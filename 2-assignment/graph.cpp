@@ -13,28 +13,6 @@ transaction_t createTransaction(
     return tx;
 }
 
-//void appendAttr(list<attribute_t> attrList, int idTx, char attr) {
-//    list<attribute_t>::iterator it;
-//    attribute_t newAttr;
-//
-//    if(attrList.size() == 0) {
-//        newAttr.idTx = idTx;
-//        newAttr.attribute = attr;
-//        attrList.push_back(newAttr);
-//        return;
-//    }
-//
-//    for(it = attrList.begin(); it != attrList.end(); (*it).attribute != attr)
-//        it++;
-//    
-//    if (it == attrList.end()) {
-//        newAttr.idTx = idTx;
-//        newAttr.attribute = attr;
-//        attrList.push_back(newAttr);
-//    }
-//    
-//}
-
 
 nodo_t* findTx(int id, vector<nodo_t> &adj) {
     for (auto &tx: adj) {
@@ -124,7 +102,6 @@ int index(vector<nodo_t> adj, int id) {
 }
 
 bool isCyclicUtil(vector<nodo_t> adj, vector<bool> &visited, int current) {
-
     if (visited[current])
         return true;
     
@@ -166,13 +143,105 @@ bool hasCycle(vector<nodo_t> adj) {
             }
         }
         visited[i] = false;
-
-        /* if (!visited[i]) {
-            if (isCyclic(i, visited, -1)) {
-                return true;
-            }
-        } */
     }
 
     return false;
+}
+
+nodo_visao_t* findTxVisao(int id, vector<nodo_visao_t> &adj) {
+    if (adj.size() == 0) {
+        return NULL;
+    }
+
+    for (auto &tx: adj) {
+        if (tx.id == id) {
+            return &tx;
+        }
+    }
+
+    return NULL;
+}
+
+nodo_visao_t* createTxVisao(transaction_t tx) {
+    nodo_visao_t* node = (nodo_visao_t*)malloc(sizeof(nodo_visao_t));
+    node->id = tx.id;
+
+    return node;
+}
+
+void updateVisao(vector<nodo_visao_t> &arr, transaction_t tx) {
+    nodo_visao_t* node = findTxVisao(tx.id, arr);
+    if (node == NULL) {
+        node = createTxVisao(tx);
+        arr.push_back(*node);
+        node = findTxVisao(tx.id, arr);
+    }
+
+    node->transactions.push_back(tx);
+}
+
+
+bool validate(vector<transaction_t> arr1, vector<transaction_t> arr2) {
+    int size1 = arr1.size();
+    int size2 = arr2.size();
+
+    for (int i = 0; i < size1; i++) {
+        transaction_t tx1 = arr1[i];
+
+        for (int j = 0; j < size2; j++) {
+            transaction_t tx2 = arr1[j];
+
+            if (tx1.operation.attr == tx2.operation.attr) {
+                if (tx1.operation.type == 'W' && tx2.operation.type == 'R') {
+                    if (tx1.time > tx2.time) {
+                        return false;
+                    }
+                }
+
+                if (tx1.operation.type == 'W' && tx2.operation.type == 'W') {
+                    if (tx1.time > tx2.time) {
+                        return false;
+                    }
+                }
+            }
+        }
+    }
+
+    return true;
+}
+
+
+bool permuteArrays(vector<nodo_visao_t> arr, int first) {
+    nodo_visao_t elem = arr[0];
+    arr[0] = arr[first];
+    arr[first] = elem;
+
+    int size = arr.size();
+    for (int i = 0; i < size - 1; i++) { // Defines a first array
+        vector<transaction_t> fstTxs = arr[i].transactions;
+        for (int j = i+1; j < size; j++) { // Defines a second array to compare
+            vector<transaction_t> scdTxs = arr[j].transactions;
+            bool isValid = validate(fstTxs, scdTxs);
+            
+            if (!isValid) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+
+bool visaoEq(vector<nodo_visao_t> arr) {
+    int size = arr.size();
+
+    for (int i = 0; i < size; i++) { // Allows all items to be first of array
+        bool isValid = permuteArrays(arr, i);
+        if (!isValid) {
+            return false;
+        }
+    }
+
+    return true;
 }
