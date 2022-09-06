@@ -13,39 +13,37 @@ int main() {
     vector<nodo_visao_t> visao;
     int count = 1;
     while (scanf("%d %d %c %c", &arrival_time, &identifier, &operation, &attribute) != EOF) {
-        //cout << "\nLeu novo" << endl;
         transaction_t tx = createTransaction(arrival_time, identifier, operation, attribute);
         bool finished = updateAdj(adj, tx);
-        cout << "Aqui" << endl; 
         updateVisao(visao, tx);
 
         if (finished) {
-            cout << count << " ";
+            // cout << count << " ";
 
-            int size = adj.size();
-            for (int i = 0; i < size; i++) {
-                cout << adj[i].id;
+            // int size = adj.size();
+            // for (int i = 0; i < size; i++) {
+            //     cout << adj[i].id;
 
-                if (i < size - 1) {
-                    cout << ",";
-                }
-            }
+            //     if (i < size - 1) {
+            //         cout << ",";
+            //     }
+            // }
 
-            if (hasCycle(adj)) {
-                cout << " NS ";
-            }
-            else {
-                cout << " SS ";
-            }
-
-            // if (visaoEq(visao))  {
-            //     cout << "SV";
+            // if (hasCycle(adj)) {
+            //     cout << " NS ";
             // }
             // else {
-            //     cout << "NV";
+            //     cout << " SS ";
             // }
+
+            if (visaoEq(visao))  {
+                cout << "SV";
+            }
+            else {
+                cout << "NV";
+            }
             
-            // cout << endl;
+            cout << endl;
 
             count++;
             adj.clear();

@@ -232,16 +232,37 @@ bool permuteArrays(vector<nodo_visao_t> arr, int first) {
     return true;
 }
 
+void heapPermutation(vector<nodo_visao_t> &a, int size) {
+    // if size becomes 1 then prints the obtained
+    // permutation
+    if (size == 1) {
+        for(auto k: a) {
+            cout << k.id << " ";
+        }
+        cout << endl;
+        return;
+    }
+ 
+    for (int i = 0; i < size; i++) {
+        heapPermutation(a, size - 1);
+ 
+        // if size is odd, swap 0th i.e (first) and
+        // (size-1)th i.e (last) element
+        if (size % 2 == 1)
+            swap(a[0], a[size - 1]);
+ 
+        // If size is even, swap ith and
+        // (size-1)th i.e (last) element
+        else
+            swap(a[i], a[size - 1]);
+    }
+}
+
 
 bool visaoEq(vector<nodo_visao_t> arr) {
     int size = arr.size();
 
-    for (int i = 0; i < size; i++) { // Allows all items to be first of array
-        bool isValid = permuteArrays(arr, i);
-        if (!isValid) {
-            return false;
-        }
-    }
+    heapPermutation(arr, size);
 
     return true;
 }
