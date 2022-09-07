@@ -148,36 +148,28 @@ bool hasCycle(vector<nodo_t> adj) {
     return false;
 }
 
-nodo_visao_t* findTxVisao(int id, vector<nodo_visao_t> &adj) {
-    if (adj.size() == 0) {
-        return NULL;
-    }
-
-    for (auto &tx: adj) {
-        if (tx.id == id) {
-            return &tx;
+int findTxVisao(int id, vector<nodo_visao_t> &adj) {
+    int size = adj.size();
+    for (int i = 0; i < size; i++) {
+        if (adj[i].id == id) {
+            return i;
         }
     }
 
-    return NULL;
-}
-
-nodo_visao_t* createTxVisao(transaction_t tx) {
-    nodo_visao_t* node = (nodo_visao_t*)malloc(sizeof(nodo_visao_t));
-    node->id = tx.id;
-
-    return node;
+    return -1;
 }
 
 void updateVisao(vector<nodo_visao_t> &arr, transaction_t tx) {
-    nodo_visao_t* node = findTxVisao(tx.id, arr);
-    if (node == NULL) {
-        node = createTxVisao(tx);
-        arr.push_back(*node);
-        node = findTxVisao(tx.id, arr);
+    int nodeIdx = findTxVisao(tx.id, arr);
+    if (nodeIdx == -1) {
+        nodo_visao_t node;
+        node.id = tx.id;
+        arr.push_back(node);
+        nodeIdx = arr.size() - 1;
     }
 
-    node->transactions.push_back(tx);
+    nodo_visao_t *aux = &arr[nodeIdx];
+    aux->transactions.push_back(tx);
 }
 
 bool notWriteTx (vector<transaction_t> tx, int init) {

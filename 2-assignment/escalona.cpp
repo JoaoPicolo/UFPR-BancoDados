@@ -35,7 +35,7 @@ int main() {
             else {
                 cout << " SS ";
             }
-            
+
             if (visaoEq(visao))  {
                 cout << "SV";
             }
