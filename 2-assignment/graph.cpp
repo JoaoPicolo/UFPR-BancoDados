@@ -189,7 +189,7 @@ bool validate(vector<transaction_t> arr1, vector<transaction_t> arr2) {
         transaction_t tx1 = arr1[i];
 
         for (int j = 0; j < size2; j++) {
-            transaction_t tx2 = arr1[j];
+            transaction_t tx2 = arr2[j];
 
             if (tx1.operation.attr == tx2.operation.attr) {
                 if (tx1.operation.type == 'W' && tx2.operation.type == 'R') {
@@ -214,9 +214,15 @@ bool heapPermutation(vector<nodo_visao_t> &a, int size) {
     // if size becomes 1 then prints the obtained
     // permutation
     int isValid = true;
+    int arraySize = a.size();
+
+    /* if (size > arraySize || size <= 0)
+        return false; */
+    
+    //cout << "Tamanho do array: " << size << endl;
 
     if (size == 1) {
-        int arraySize = a.size();
+        arraySize = a.size();
         for (int i = 0; i < arraySize - 1; i++) {
             cout << "Comparing " << a[i].id << " with " << a[i+1].id << ": ";
             isValid = validate(a[i].transactions, a[i+1].transactions);
@@ -234,6 +240,8 @@ bool heapPermutation(vector<nodo_visao_t> &a, int size) {
         if (!isValid) {
             return false;
         }
+
+        cout << "valid" << endl;
  
         // if size is odd, swap 0th i.e (first) and
         // (size-1)th i.e (last) element
