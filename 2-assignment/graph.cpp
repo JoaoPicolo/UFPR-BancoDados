@@ -69,7 +69,6 @@ bool updateAdj(vector<nodo_t> &adj, transaction_t tx) {
             vector<operation_t> operations = item.operations;
             for (auto op: operations) {
                 if (op.attr == tx.operation.attr) {
-                    //cout << "Operacao eh " << op.type << " e " << tx.operation.type << endl;
                     if (
                         ((op.type == 'R' || op.type == 'r') && (tx.operation.type == 'W' || tx.operation.type == 'w')) ||
                         ((op.type == 'W' || op.type == 'w') && (tx.operation.type == 'R' || tx.operation.type == 'r')) ||
@@ -100,24 +99,33 @@ int index(vector<nodo_t> adj, int id) {
 }
 
 bool isCyclicUtil(vector<nodo_t> adj, vector<bool> &visited, int current) {
-    if (visited[current])
+    //cout << "Esta visitando " << current << endl;
+
+    if (visited[current]) {
+        //cout << "Eh true 1" << endl;
         return true;
+    }
     
     visited[current] = true;
+    //cout << "Marcou " << current << " como true" << endl; 
     bool flag = false;
 
     set<int>::iterator it;
 
     for(it = adj[current].adjTx.begin(); it != adj[current].adjTx.end(); it++) {
         int currentIndex = index(adj, (*it));
-        /* cout << "Trx: " << (*it) << " index: " << currentIndex << endl; */
+        //cout << "Vai para " << currentIndex << endl;
         flag = isCyclicUtil(adj, visited, currentIndex);
 
         if (flag) {
+            //cout << "Eh true 2" << endl;
             return true;
         }
     }
 
+    visited[current] = false;
+
+    //cout << "Eh false" << endl;
     return false;
 }
 
@@ -129,11 +137,13 @@ bool hasCycle(vector<nodo_t> adj) {
     
     int size = adj.size();
     for (int i = 0; i < size; i++) {
+        //cout << "\nEstah em " << i << endl; 
         visited[i] = true;
+        //cout << "Marcou " << i << " como true" << endl; 
     
         for(it = adj[i].adjTx.begin(); it != adj[i].adjTx.end(); it++) {
             int currentIndex = index(adj, (*it));
-            /* cout << "Trx: " << (*it) << " index: " << currentIndex << endl; */
+            //cout << "Vai para " << currentIndex << endl;
             flag = isCyclicUtil(adj, visited, currentIndex);
 
             if (flag) {
@@ -141,6 +151,7 @@ bool hasCycle(vector<nodo_t> adj) {
             }
         }
         visited[i] = false;
+        //cout << "Marcou " << i << " como false" << endl; 
     }
 
     return false;
