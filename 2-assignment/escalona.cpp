@@ -11,9 +11,12 @@ int main() {
     // Lista de adjacência para construção do grafo
     vector<nodo_t> adj;
     vector<nodo_visao_t> visao;
+    vector<attribut_t> attributes;
+
     int count = 1;
     while (scanf("%d %d %c %c", &arrival_time, &identifier, &operation, &attribute) != EOF) {
         transaction_t tx = createTransaction(arrival_time, identifier, operation, attribute);
+        updateAttr(attributes, tx);
         bool finished = updateAdj(adj, tx);
         updateVisao(visao, tx);
 
@@ -36,7 +39,7 @@ int main() {
                 cout << " SS ";
             }
 
-            if (visaoEq(visao))  {
+            if (visaoEq(visao, attributes))  {
                 cout << "SV";
             }
             else {

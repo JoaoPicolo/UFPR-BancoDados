@@ -14,27 +14,47 @@ transaction_t createTransaction(
 }
 
 
-nodo_t* findTx(int id, vector<nodo_t> &adj) {
-    for (auto &tx: adj) {
-        if (tx.id == id) {
-            return &tx;
+int findTx(int id, vector<nodo_t> &adj) {
+    int size = adj.size();
+
+    for (int i = 0; i< size; i++) {
+        if (adj[i].id == id) {
+            return i;
         }
     }
 
-    return NULL;
+    return -1;
 }
 
+void updateAttr(vector<attribut_t> &attr, transaction_t tx) {
 
-nodo_t* createTx(transaction_t tx) {
-    nodo_t* node = (nodo_t*)malloc(sizeof(nodo_t));
-    node->id = tx.id;
-    node->commit = false;
-    node->visited = false;
-    node->adjTx = {};
+    if (tx.operation.type != 'W' && tx.operation.type != 'w') {
+        return;
+    }
 
-    return node;
+    attribut_t aux;
+    if (attr.size() == 0) {
+        aux.attr = tx.operation.attr;
+        aux.id = tx.id;
+        attr.push_back(aux);
+        return;
+    }
+
+    bool find = false;
+    for (auto &attribute: attr) {
+        if (attribute.attr == tx.operation.attr) {
+            attribute.id = tx.id;
+            find = true;
+            return;
+        }
+    }
+
+    if (!find) {
+        aux.attr = tx.operation.attr;
+        aux.id = tx.id;
+        attr.push_back(aux);
+    }
 }
-
 
 bool transactionsClosed(vector<nodo_t> adj) {
     for (auto tx: adj) {
@@ -48,12 +68,19 @@ bool transactionsClosed(vector<nodo_t> adj) {
 
 
 bool updateAdj(vector<nodo_t> &adj, transaction_t tx) {
-    nodo_t* node = findTx(tx.id, adj);
-    if (node == NULL) {
-        node = createTx(tx);
-        adj.push_back(*node);
-        node = findTx(tx.id, adj);
+    int nodeIdx = findTx(tx.id, adj);
+    if (nodeIdx == -1) {
+        nodo_t aux;
+        aux.id = tx.id;
+        aux.commit = false;
+        aux.visited = false;
+        aux.adjTx = {};
+    
+        adj.push_back(aux);
+        nodeIdx = adj.size() - 1;
     }
+
+    nodo_t *node = &adj[nodeIdx];
 
     if (tx.operation.type == 'C' || tx.operation.type == 'c') {
         node->commit = true;
@@ -172,25 +199,19 @@ void updateVisao(vector<nodo_visao_t> &arr, transaction_t tx) {
     aux->transactions.push_back(tx);
 }
 
-bool notWriteTx (vector<transaction_t> tx, int init, char attr) {
+bool notWriteTx (vector<attribut_t> attr, int txId, char attrTx) {
 
-    int size = tx.size();
-
-    for (int i = init; i < size; i++) {
-        //cout << "posição: " << i << "tipo: " << tx[i].operation.type << endl;
-        if ((tx[i].operation.type == 'W' || tx[i].operation.type == 'w') && (tx[i].operation.attr == attr)) {
-            return true;
+    for (auto attribute: attr) {
+        if (attribute.attr == attrTx) {
+            return (attribute.id == txId);
         }
-        cout << tx[i].id << " nao escreve em " << attr << endl;
     }
-
-    //cout << "-----" << endl;
 
     return false;
 }
 
 
-bool validate(vector<transaction_t> arr1, vector<transaction_t> arr2) {
+bool validate(vector<attribut_t> attr, vector<transaction_t> arr1, vector<transaction_t> arr2) {
     int size1 = arr1.size();
     int size2 = arr2.size();
 
@@ -201,15 +222,18 @@ bool validate(vector<transaction_t> arr1, vector<transaction_t> arr2) {
             transaction_t tx2 = arr2[j];
 
             if (tx1.operation.attr == tx2.operation.attr) {
+                //cout << endl;
                 if ((tx1.operation.type == 'W' || tx1.operation.type == 'w') && (tx2.operation.type == 'R' || tx2.operation.type == 'r')) {
-                    if (tx1.time < tx2.time && notWriteTx(arr1, i+1, tx1.operation.attr)) {
-                        return true;
+                    cout << "\nverifica se " << tx1.id << " escreve em " << tx1.operation.attr << " se " << tx2.id << " for mais recente" << endl;
+                    if (tx1.time < tx2.time) {
+                        return false;
                     }
-                    else return false;
+                    else return true;
                 }
 
                 if ((tx1.operation.type == 'W' || tx1.operation.type == 'w') && (tx2.operation.type == 'W' || tx2.operation.type == 'w')) {
-                    if (tx1.time < tx2.time && notWriteTx(arr1, i+1, tx1.operation.attr)) {
+                    //cout << "\nverifica se " << tx1.id << " escreve em " << tx1.operation.attr << " se " << tx2.id << " for mais recente" << endl;
+                    if (tx1.time < tx2.time && notWriteTx(attr, tx2.id, tx1.operation.attr)) {
                         return true;
                     }
                     else return false;
@@ -221,18 +245,18 @@ bool validate(vector<transaction_t> arr1, vector<transaction_t> arr2) {
     return true;
 }
 
-bool heapPermutation(vector<nodo_visao_t> &a, int size) {
+bool heapPermutation(vector<attribut_t> attributes, vector<nodo_visao_t> &a, int size) {
     // if size becomes 1 then prints the obtained
     // permutation
-    int isValid = true;
+    int isValid = false;
     int arraySize = a.size();
 
     if (size == 1) {
         arraySize = a.size();
         for (int i = 0; i < arraySize - 1; i++) {
             //cout << "Comparing " << a[i].id << " with " << a[i+1].id << ": ";
-            isValid = validate(a[i].transactions, a[i+1].transactions);
-            //cout << isValid << endl;
+            isValid = validate(attributes, a[i].transactions, a[i+1].transactions);
+            cout << isValid << endl;
             if (isValid) {
                 return true;
             }
@@ -242,7 +266,8 @@ bool heapPermutation(vector<nodo_visao_t> &a, int size) {
     }
  
     for (int i = 0; i < size; i++) {
-        isValid = heapPermutation(a, size - 1);
+        isValid = heapPermutation(attributes, a, size - 1);
+        cout << "isValid: " << isValid << endl;
         if (isValid) {
             return true;
         }
@@ -266,8 +291,8 @@ bool heapPermutation(vector<nodo_visao_t> &a, int size) {
 }
 
 
-bool visaoEq(vector<nodo_visao_t> arr) {
+bool visaoEq(vector<nodo_visao_t> arr, vector<attribut_t> attributes) {
     int size = arr.size();
 
-    return heapPermutation(arr, size);
+    return heapPermutation(attributes, arr, size);
 }
