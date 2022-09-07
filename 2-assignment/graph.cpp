@@ -172,16 +172,19 @@ void updateVisao(vector<nodo_visao_t> &arr, transaction_t tx) {
     aux->transactions.push_back(tx);
 }
 
-bool notWriteTx (vector<transaction_t> tx, int init) {
+bool notWriteTx (vector<transaction_t> tx, int init, char attr) {
 
     int size = tx.size();
 
     for (int i = init; i < size; i++) {
         //cout << "posição: " << i << "tipo: " << tx[i].operation.type << endl;
-        if (tx[i].operation.type == 'W' || tx[i].operation.type == 'w') {
+        if ((tx[i].operation.type == 'W' || tx[i].operation.type == 'w') && (tx[i].operation.attr == attr)) {
             return true;
         }
+        cout << tx[i].id << " nao escreve em " << attr << endl;
     }
+
+    //cout << "-----" << endl;
 
     return false;
 }
@@ -199,13 +202,14 @@ bool validate(vector<transaction_t> arr1, vector<transaction_t> arr2) {
 
             if (tx1.operation.attr == tx2.operation.attr) {
                 if ((tx1.operation.type == 'W' || tx1.operation.type == 'w') && (tx2.operation.type == 'R' || tx2.operation.type == 'r')) {
-                    if (tx1.time > tx2.time) {
-                        return false;
+                    if (tx1.time < tx2.time && notWriteTx(arr1, i+1, tx1.operation.attr)) {
+                        return true;
                     }
+                    else return false;
                 }
 
                 if ((tx1.operation.type == 'W' || tx1.operation.type == 'w') && (tx2.operation.type == 'W' || tx2.operation.type == 'w')) {
-                    if (tx1.time < tx2.time && notWriteTx(arr1, i+1)) {
+                    if (tx1.time < tx2.time && notWriteTx(arr1, i+1, tx1.operation.attr)) {
                         return true;
                     }
                     else return false;
