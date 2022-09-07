@@ -55,7 +55,7 @@ bool updateAdj(vector<nodo_t> &adj, transaction_t tx) {
         node = findTx(tx.id, adj);
     }
 
-    if (tx.operation.type == 'C') {
+    if (tx.operation.type == 'C' || tx.operation.type == 'c') {
         node->commit = true;
         return transactionsClosed(adj);
     }
@@ -73,9 +73,9 @@ bool updateAdj(vector<nodo_t> &adj, transaction_t tx) {
                 if (op.attr == tx.operation.attr) {
                     //cout << "Operacao eh " << op.type << " e " << tx.operation.type << endl;
                     if (
-                        (op.type == 'R' && tx.operation.type == 'W') ||
-                        (op.type == 'W' && tx.operation.type == 'R') ||
-                        (op.type == 'W' && tx.operation.type == 'W')
+                        ((op.type == 'R' || op.type == 'r') && (tx.operation.type == 'W' || tx.operation.type == 'w')) ||
+                        ((op.type == 'W' || op.type == 'w') && (tx.operation.type == 'R' || tx.operation.type == 'r')) ||
+                        ((op.type == 'W' || op.type == 'w') && (tx.operation.type == 'W' || tx.operation.type == 'w'))
                     ) {
                         //cout << "Vai adicionar " << item.id << " em " << node->id << endl;
                         node->adjTx.insert(item.id);
@@ -180,6 +180,20 @@ void updateVisao(vector<nodo_visao_t> &arr, transaction_t tx) {
     node->transactions.push_back(tx);
 }
 
+bool notWriteTx (vector<transaction_t> tx, int init) {
+
+    int size = tx.size();
+
+    for (int i = init; i < size; i++) {
+        //cout << "posição: " << i << "tipo: " << tx[i].operation.type << endl;
+        if (tx[i].operation.type == 'W' || tx[i].operation.type == 'w') {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 
 bool validate(vector<transaction_t> arr1, vector<transaction_t> arr2) {
     int size1 = arr1.size();
@@ -192,16 +206,17 @@ bool validate(vector<transaction_t> arr1, vector<transaction_t> arr2) {
             transaction_t tx2 = arr2[j];
 
             if (tx1.operation.attr == tx2.operation.attr) {
-                if (tx1.operation.type == 'W' && tx2.operation.type == 'R') {
+                if ((tx1.operation.type == 'W' || tx1.operation.type == 'w') && (tx2.operation.type == 'R' || tx2.operation.type == 'r')) {
                     if (tx1.time > tx2.time) {
                         return false;
                     }
                 }
 
-                if (tx1.operation.type == 'W' && tx2.operation.type == 'W') {
-                    if (tx1.time > tx2.time) {
-                        return false;
+                if ((tx1.operation.type == 'W' || tx1.operation.type == 'w') && (tx2.operation.type == 'W' || tx2.operation.type == 'w')) {
+                    if (tx1.time < tx2.time && notWriteTx(arr1, i+1)) {
+                        return true;
                     }
+                    else return false;
                 }
             }
         }
@@ -216,32 +231,27 @@ bool heapPermutation(vector<nodo_visao_t> &a, int size) {
     int isValid = true;
     int arraySize = a.size();
 
-    /* if (size > arraySize || size <= 0)
-        return false; */
-    
-    //cout << "Tamanho do array: " << size << endl;
-
     if (size == 1) {
         arraySize = a.size();
         for (int i = 0; i < arraySize - 1; i++) {
-            cout << "Comparing " << a[i].id << " with " << a[i+1].id << ": ";
+            //cout << "Comparing " << a[i].id << " with " << a[i+1].id << ": ";
             isValid = validate(a[i].transactions, a[i+1].transactions);
-            cout << isValid << endl;
-            if (!isValid) {
-                return false;
+            //cout << isValid << endl;
+            if (isValid) {
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
  
     for (int i = 0; i < size; i++) {
         isValid = heapPermutation(a, size - 1);
-        if (!isValid) {
-            return false;
+        if (isValid) {
+            return true;
         }
 
-        cout << "valid" << endl;
+        //cout << "not valid" << endl;
  
         // if size is odd, swap 0th i.e (first) and
         // (size-1)th i.e (last) element
@@ -252,9 +262,10 @@ bool heapPermutation(vector<nodo_visao_t> &a, int size) {
         // (size-1)th i.e (last) element
         else
             swap(a[i], a[size - 1]);
+        
     }
 
-    return true;
+    return false;
 
 }
 
