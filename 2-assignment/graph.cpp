@@ -14,25 +14,16 @@ transaction_t createTransaction(
 }
 
 
-nodo_t* findTx(int id, vector<nodo_t> &adj) {
-    for (auto &tx: adj) {
-        if (tx.id == id) {
-            return &tx;
+int findTx(int id, vector<nodo_t> &adj) {
+    int size = adj.size();
+
+    for (int i = 0; i< size; i++) {
+        if (adj[i].id == id) {
+            return i;
         }
     }
 
-    return NULL;
-}
-
-
-nodo_t* createTx(transaction_t tx) {
-    nodo_t* node = (nodo_t*)malloc(sizeof(nodo_t));
-    node->id = tx.id;
-    node->commit = false;
-    node->visited = false;
-    node->adjTx = {};
-
-    return node;
+    return -1;
 }
 
 
@@ -48,12 +39,19 @@ bool transactionsClosed(vector<nodo_t> adj) {
 
 
 bool updateAdj(vector<nodo_t> &adj, transaction_t tx) {
-    nodo_t* node = findTx(tx.id, adj);
-    if (node == NULL) {
-        node = createTx(tx);
-        adj.push_back(*node);
-        node = findTx(tx.id, adj);
+    int nodeIdx = findTx(tx.id, adj);
+    if (nodeIdx == -1) {
+        nodo_t aux;
+        aux.id = tx.id;
+        aux.commit = false;
+        aux.visited = false;
+        aux.adjTx = {};
+    
+        adj.push_back(aux);
+        nodeIdx = adj.size() - 1;
     }
+
+    nodo_t *node = &adj[nodeIdx];
 
     if (tx.operation.type == 'C' || tx.operation.type == 'c') {
         node->commit = true;
@@ -173,7 +171,6 @@ void updateVisao(vector<nodo_visao_t> &arr, transaction_t tx) {
 }
 
 bool notWriteTx (vector<transaction_t> tx, int init) {
-
     int size = tx.size();
 
     for (int i = init; i < size; i++) {
