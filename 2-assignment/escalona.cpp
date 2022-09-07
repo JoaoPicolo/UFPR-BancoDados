@@ -1,4 +1,6 @@
+#include <bits/stdc++.h>
 #include "graph.hpp"
+
 
 int main() {
     cin.tie(0);
@@ -23,9 +25,25 @@ int main() {
         if (finished) {
             cout << count << " ";
 
-            int size = adj.size();
+            vector<int> idsTx;
+            int size = visao.size();
             for (int i = 0; i < size; i++) {
-                cout << adj[i].id;
+                idsTx.push_back(visao[i].id);
+            }
+
+
+            // for (auto a: adj) {
+            //     cout << a.id << ": ";
+            //     set<int> l = a.adjTx;
+            //     for (auto it = l.begin(); it != l.end(); ++it)
+            //         cout << ' ' << *it;
+            //     cout << endl;
+            // }
+
+
+            sort(idsTx.begin(), idsTx.end());
+            for (int i = 0; i < size; i++) {
+                cout << idsTx[i];
 
                 if (i < size - 1) {
                     cout << ",";
