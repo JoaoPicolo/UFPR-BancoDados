@@ -61,7 +61,9 @@ bool isLastWrite(int startIndex, int id, set<int>writters, vector<node_vision_t>
 
     for (int i = startIndex; i < size; i++) {
         node_vision_t current = vision[i];
+        //cout << "Comeca em " << startIndex << endl;
         for(it = writters.begin(); it != writters.end(); it++) {
+            //cout << "Compara com " << (*it) << endl;
             if ((current.id == (*it)) && (id != (*it))) {
                 // cout << *it << endl;
                 return false;
@@ -79,20 +81,21 @@ bool validateWrite(helpers_t helper, vector<node_vision_t> vision) {
     for (int i = 0; i < size - 1; i++) {
         vector<transaction_vision_t> transactions = vision[i].transactions;
         int transactionsSize = transactions.size();
-        // cout << vision[i].id << endl;
+        //cout << vision[i].id << endl;
         for (int j = 0; j < transactionsSize; j++) {
             transaction_vision_t transaction = transactions[j];
 
             if (transaction.operation.type == 'W' || transaction.operation.type == 'w') {
                 char attribute = transaction.operation.attr;
                 if (helper.lastWriter[attribute] == transaction.id) {
-                    // cout << attribute << ": ";
-                    bool isLast = isLastWrite(j+1, transaction.id, helper.writters[attribute], vision);
+                    //cout << attribute << ": ";
+                    int index = findTransactionIndex(vision, transaction.id);
+                    bool isLast = isLastWrite(index+1, transaction.id, helper.writters[attribute], vision);
                     if (!isLast) {
-                        // cout << "False write";
+                        //cout << "False write";
                         return false;
                     }
-                    // cout << endl;
+                    //cout << endl;
                 }
             }
         }
@@ -124,7 +127,7 @@ bool validateCleanRead(int currentIndex, vector<node_vision_t> vision) {
                             //cout << "Eh write" << endl;
                             if (previousTransaction.operation.attr == transaction.operation.attr) {
                                 //cout << "Eh mesmo" << endl;
-                                // cout << "False valid" << endl;
+                                //cout << "False valid" << endl;
                                 return false;
                             }
                         }
@@ -157,7 +160,7 @@ bool validateRead(int currentIndex, vector<node_vision_t> vision) {
                     if (previousTransaction.operation.type == 'R' || previousTransaction.operation.type == 'r') {
                         if (previousTransaction.operation.attr == transaction.operation.attr) {
                             if (previousTransaction.time > transaction.time) {
-                                // cout << "False read" << endl;
+                                //cout << "False read" << endl;
                                 return false;
                             }
                         }
