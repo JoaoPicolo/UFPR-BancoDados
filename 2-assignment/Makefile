@@ -1,5 +1,5 @@
 CC     = g++
-CFLAGS = -Wall -O3
+CFLAGS = -Wall
 LFLAGS = 
 
 PROG = escalona 

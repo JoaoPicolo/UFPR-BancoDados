@@ -109,7 +109,7 @@ bool isLastWrite(int startIndex, int id, set<int>writters, vector<node_vision_t>
     for (int i = startIndex; i < size; i++) {
         node_vision_t current = vision[i];
         for(it = writters.begin(); it != writters.end(); it++) {
-            if ((current.id == (*it)) && (id != (*it))) {
+            if (current.id == (*it)) {
                 return false;
             }
         }
@@ -261,13 +261,13 @@ bool heapPermutation(helpers_t helper, vector<node_vision_t> &vision, int size) 
             int realSize = vision.size();
             bool validClean = true;
 
-            for (int i = 1; i < realSize; i++) {
+            for (int i = 1; (i < realSize) && validClean; i++) {
                 validClean = validClean && validateCleanRead(i, vision);
             }
 
             if (validClean) {
                 bool validRead = true;
-                for (int i = 1; i < realSize; i++) {
+                for (int i = 1; (i < realSize) && validRead; i++) {
                     validRead = validRead &&  validateRead(i, vision);
                 }
 
