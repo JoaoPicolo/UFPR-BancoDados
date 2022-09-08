@@ -10,8 +10,8 @@ int main() {
     char operation, attribute;
 
 
+    helpers_t helper;
     vector<node_vision_t> vision;
-    vector<attribute_t> attributes;
     vector<node_conflict_t> adjacencies;
 
     int counter = 1;
@@ -20,9 +20,7 @@ int main() {
         transaction_t transaction = createTransaction(arrival_time, identifier, operation, attribute);
 
         updateConflict(adjacencies, transaction);
-
-        updateVision(vision, transaction);
-        updateAttributes(attributes, transaction);
+        updateVision(helper, vision, transaction);
 
         if ((operation == 'C') || (operation == 'c')) {
             endedTransactions = transactionsClosed(adjacencies);
@@ -40,7 +38,33 @@ int main() {
                 cout << " NS ";
             }
 
-            if (isVisionEquivalent(vision, attributes))  {
+            // cout << "Last writer:" << endl;
+            // for (auto l: helper.lastWriter) {
+            //     cout << l.first << ": " << l.second << endl;
+            // }
+
+            // cout << "Writters:" << endl;
+            // for (auto l: helper.writters) {
+            //     cout << l.first << ": ";
+            //     set<int> writters = l.second;
+
+            //     set<int>::iterator it;
+            //     for(it = writters.begin(); it != writters.end(); it++) {
+            //         cout << (*it) << " ";
+            //     }
+            //     cout << endl;
+            // }
+
+            cout << "Transactions" << endl;
+            for (auto v: vision) {
+                cout << v.id << endl;
+                vector<transaction_vision_t> trans = v.transactions;
+                for (auto t: trans) {
+                    cout << t.time << " " << t.isCleanRead << endl;
+                }
+            }
+
+            if (isVisionEquivalent(helper, vision))  {
                 cout << "SV";
             }
             else {
@@ -54,6 +78,10 @@ int main() {
 
             vision.clear();
             adjacencies.clear();
+
+            helper.writters.clear();
+            helper.lastWriter.clear();
+            helper.writtenAttributes.clear();
         }
     }
 }

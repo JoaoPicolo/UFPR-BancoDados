@@ -2,8 +2,6 @@
 #define __CONFLICT__
 
 #include "utils.hpp"
-#include <set>
-#include <vector>
 
 struct node_conflict_t {
     int id;
