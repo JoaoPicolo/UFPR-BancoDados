@@ -98,6 +98,7 @@ bool updateAdj(vector<nodo_t> &adj, transaction_t tx) {
             vector<operation_t> operations = item.operations;
             for (auto op: operations) {
                 if (op.attr == tx.operation.attr) {
+                    //cout << "Operacao eh " << op.type << " e " << tx.operation.type << endl;
                     if (
                         ((op.type == 'R' || op.type == 'r') && (tx.operation.type == 'W' || tx.operation.type == 'w')) ||
                         ((op.type == 'W' || op.type == 'w') && (tx.operation.type == 'R' || tx.operation.type == 'r')) ||
@@ -128,33 +129,24 @@ int index(vector<nodo_t> adj, int id) {
 }
 
 bool isCyclicUtil(vector<nodo_t> adj, vector<bool> &visited, int current) {
-    //cout << "Esta visitando " << current << endl;
-
-    if (visited[current]) {
-        //cout << "Eh true 1" << endl;
+    if (visited[current])
         return true;
-    }
     
     visited[current] = true;
-    //cout << "Marcou " << current << " como true" << endl; 
     bool flag = false;
 
     set<int>::iterator it;
 
     for(it = adj[current].adjTx.begin(); it != adj[current].adjTx.end(); it++) {
         int currentIndex = index(adj, (*it));
-        //cout << "Vai para " << currentIndex << endl;
+        /* cout << "Trx: " << (*it) << " index: " << currentIndex << endl; */
         flag = isCyclicUtil(adj, visited, currentIndex);
 
         if (flag) {
-            //cout << "Eh true 2" << endl;
             return true;
         }
     }
 
-    visited[current] = false;
-
-    //cout << "Eh false" << endl;
     return false;
 }
 
@@ -166,13 +158,11 @@ bool hasCycle(vector<nodo_t> adj) {
     
     int size = adj.size();
     for (int i = 0; i < size; i++) {
-        //cout << "\nEstah em " << i << endl; 
         visited[i] = true;
-        //cout << "Marcou " << i << " como true" << endl; 
     
         for(it = adj[i].adjTx.begin(); it != adj[i].adjTx.end(); it++) {
             int currentIndex = index(adj, (*it));
-            //cout << "Vai para " << currentIndex << endl;
+            /* cout << "Trx: " << (*it) << " index: " << currentIndex << endl; */
             flag = isCyclicUtil(adj, visited, currentIndex);
 
             if (flag) {
@@ -180,7 +170,6 @@ bool hasCycle(vector<nodo_t> adj) {
             }
         }
         visited[i] = false;
-        //cout << "Marcou " << i << " como false" << endl; 
     }
 
     return false;
@@ -235,11 +224,11 @@ bool validate(vector<attribut_t> attr, vector<transaction_t> arr1, vector<transa
             if (tx1.operation.attr == tx2.operation.attr) {
                 //cout << endl;
                 if ((tx1.operation.type == 'W' || tx1.operation.type == 'w') && (tx2.operation.type == 'R' || tx2.operation.type == 'r')) {
-                    cout << "\nverifica se " << tx1.id << " escreve em " << tx1.operation.attr << " se " << tx2.id << " for mais recente" << endl;
+                    //cout << "\nverifica se " << tx1.id << " escreve em " << tx1.operation.attr << " se " << tx2.id << " for mais recente" << endl;
                     if (tx1.time < tx2.time) {
-                        return false;
+                        return true;
                     }
-                    else return true;
+                    else return false;
                 }
 
                 if ((tx1.operation.type == 'W' || tx1.operation.type == 'w') && (tx2.operation.type == 'W' || tx2.operation.type == 'w')) {
@@ -249,6 +238,14 @@ bool validate(vector<attribut_t> attr, vector<transaction_t> arr1, vector<transa
                     }
                     else return false;
                 }
+
+                /* if ((tx1.operation.type == 'R' || tx1.operation.type == 'r') && (tx2.operation.type == 'W' || tx2.operation.type == 'w')) {
+                    //cout << "\nverifica se " << tx1.id << " escreve em " << tx1.operation.attr << " se " << tx2.id << " for mais recente" << endl;
+                    if (tx1.time < tx2.time && notWriteTx(attr, tx2.id, tx1.operation.attr)) {
+                        return true;
+                    }
+                    else return false;
+                } */
             }
         }
     }
@@ -267,7 +264,7 @@ bool heapPermutation(vector<attribut_t> attributes, vector<nodo_visao_t> &a, int
         for (int i = 0; i < arraySize - 1; i++) {
             //cout << "Comparing " << a[i].id << " with " << a[i+1].id << ": ";
             isValid = validate(attributes, a[i].transactions, a[i+1].transactions);
-            cout << isValid << endl;
+            //cout << isValid << endl;
             if (isValid) {
                 return true;
             }
@@ -278,7 +275,6 @@ bool heapPermutation(vector<attribut_t> attributes, vector<nodo_visao_t> &a, int
  
     for (int i = 0; i < size; i++) {
         isValid = heapPermutation(attributes, a, size - 1);
-        cout << "isValid: " << isValid << endl;
         if (isValid) {
             return true;
         }

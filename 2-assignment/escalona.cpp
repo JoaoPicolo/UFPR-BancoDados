@@ -23,6 +23,7 @@ int main() {
         updateVisao(visao, tx);
 
         if (finished) {
+
             cout << count << " ";
 
             vector<int> idsTx;

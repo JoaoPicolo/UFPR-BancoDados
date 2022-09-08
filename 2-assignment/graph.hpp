@@ -39,6 +39,8 @@ transaction_t createTransaction(
 );
 
 
+void copyVisao(vector<nodo_visao_t> a);
+
 void updateAttr(vector<attribut_t> &attr, transaction_t tx);
 
 bool updateAdj(vector<nodo_t> &adj, transaction_t tx);
