@@ -3,7 +3,8 @@
 #include "conflict.hpp"
 
 
-/** @brief Função principal, responsável pela leitura da entrada.
+/** @brief Função principal, responsável pela leitura da entrada
+* e tratamento das operações.
 */
 int main() {
     cin.tie(0);

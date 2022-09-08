@@ -3,6 +3,12 @@
 
 #include "utils.hpp"
 
+/** @brief Estrutura na qual se guarda um nodo do teste de conflito.
+* @details Esta estutura armazena o id da transação realizada, o estado dela
+* (commitada ou ativa), se ela já foi visitada (utilizado para a recursão),
+* as operações que a transação com o id corresponde já realizou, além dos vértices adjacentes
+* à transação correspondente no grafo formado.
+*/
 struct node_conflict_t {
     int id;
     bool commit;

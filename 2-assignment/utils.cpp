@@ -1,14 +1,16 @@
 #include "utils.hpp"
 
-/** @brief Função responsável pela criação de uma nova transação.
-* @details Essa função recebe os parametros lidos da entrada padrao
+
+/** @brief Cria de uma nova transação.
+* @details Essa função recebe os parâmetros lidos da entrada padrão
 * e os armazena na estrutura designada.
 *
-* @param arrival_time Tempo de entrada de uma operacao
-* @param identifier Identificador relativo a transacao a qual a operacao pertence
-* @param operation Tipo da operacao: leitura (R), escrita (W) ou commit (C)
-* @param atribbute Atributo sob o qual a operacao esta sendo realizada
-* @return bool
+* @param arrival_time Tempo de entrada de uma operação.
+* @param identifier Identificador relativo a transação à qual a operação pertence.
+* @param operation Tipo da operação: leitura (R), escrita (W) ou commit (C).
+* @param atribbute Atributo sob o qual a operação está sendo realizada.
+*
+* @return transaction_t
 */
 transaction_t createTransaction(
     int arrival_time, int identifier,

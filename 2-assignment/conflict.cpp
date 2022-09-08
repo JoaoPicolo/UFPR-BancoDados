@@ -1,5 +1,15 @@
 #include "conflict.hpp"
 
+
+/** @brief Retorna o index de uma transação no vetor de transações.
+* @details A partir de um id de uma transação, esta função é responsável por retornar
+* o index da transação correspondente no vetor de transações já criado.
+*
+* @param adjacencies Vetor com todas as transações ativas.
+* @param id Identificador da transação a ser encontrada.
+*
+* @return int
+*/
 int findTransactionIndex(vector<node_conflict_t> &adjacencies, int id) {
     int size = adjacencies.size();
 
@@ -12,6 +22,16 @@ int findTransactionIndex(vector<node_conflict_t> &adjacencies, int id) {
     return -1;
 }
 
+
+/** @brief Atualiza o vetor de transações lidas para.
+* @details Ao receber uma nova transação, um nodo correspondente é criado no vetor
+* de transações caso não exista e atualizado caso exista.
+*
+* @param adjacencies Vetor com todas as transações ativas.
+* @param transaction Nova transação lida.
+*
+* @return void
+*/
 void updateConflict(vector<node_conflict_t> &adjacencies, transaction_t transaction) {
     int nodeIndex = findTransactionIndex(adjacencies, transaction.id);
 
@@ -63,6 +83,14 @@ void updateConflict(vector<node_conflict_t> &adjacencies, transaction_t transact
     }
 }
 
+
+/** @brief Função responsável por apontar se todas as transações ativas foram commitadas.
+* @details Percorre o vetor de tranções ativas a caso todas tenham sido commitadas returna true.
+*
+* @param adjacencies Vetor com todas as transações ativas.
+*
+* @return bool
+*/
 bool transactionsClosed(vector<node_conflict_t> adjacencies) {
     for (auto transaction: adjacencies) {
         if (transaction.commit == false) {
@@ -73,6 +101,18 @@ bool transactionsClosed(vector<node_conflict_t> adjacencies) {
     return true;
 }
 
+
+/** @brief Função responsável por informar o index da transação
+* @details Ao executarmos uma Depth First Search (DFS) é necessário
+* armazenar em um vetor de booleanos se a posição corrente já foi visitada
+* como forma de se detectar ciclos. Está função retorna o index de uma transação
+* neste vetor de booleanos que possui indexes correspondentes ao vetor de transações ativas.
+*
+* @param adjacencies Vetor com todas as transações ativas.
+* @param id Identificador da transação a ser encontrada.
+*
+* @return int
+*/
 int visitedIndex(vector<node_conflict_t> adjacencies, int id) {
     int size = adjacencies.size();
     for (int i = 0; i < size; i++) {
@@ -84,6 +124,18 @@ int visitedIndex(vector<node_conflict_t> adjacencies, int id) {
     
 }
 
+
+/** @brief Função auxiliar à Depth First Search (DFS)
+* @details Responsável pela recursão da DFS, está função permite identificar
+* quando um nodo é visitado mais de uma vez dentro da mesma iteração, indicando
+* a existência de um ciclo. Retorna verdadeiro caso o ciclo seja identificado.
+*
+* @param adjacencies Vetor com todas as transações ativas.
+* @param visited Vetor com as posições já visitadas.
+* @param currentIndex Index da transação corrente analisada pela DFS.
+*
+* @return bool
+*/
 bool isCyclicUtil(vector<node_conflict_t> adjacencies, vector<bool> &visited, int currentIndex) {
     if (visited[currentIndex])
         return true;
@@ -106,6 +158,16 @@ bool isCyclicUtil(vector<node_conflict_t> adjacencies, vector<bool> &visited, in
     return false;
 }
 
+
+/** @brief Depth First Search (DFS) para encontrar ciclos no grafo
+* @details Utiliza-se neste momento o vetor neighbours da estrutura node_conflict_t
+* como forma de identificar as transações adjacentes à transação corrente no grafo
+* montado como forma de detectar ciclos. Ao final retorna se o grafo possui um ciclo ou não.
+*
+* @param adjacencies Vetor com todas as transações ativas.
+*
+* @return bool
+*/
 bool hasCycle(vector<node_conflict_t> adjacencies) {
     bool flag = false;
     int size = adjacencies.size();

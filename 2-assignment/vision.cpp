@@ -1,5 +1,15 @@
 #include "vision.hpp"
 
+
+/** @brief Retorna o index de uma transação no vetor de transações.
+* @details A partir de um id de uma transação, esta função é responsável por retornar
+* o index da transação correspondente no vetor de transações já criado.
+*
+* @param vision Vetor com todas as transações ativas.
+* @param id Identificador da transação a ser encontrada.
+*
+* @return int
+*/
 int findTransactionIndex(vector<node_vision_t> &vision, int id) {
     int size = vision.size();
     for (int i = 0; i < size; i++) {
@@ -11,6 +21,17 @@ int findTransactionIndex(vector<node_vision_t> &vision, int id) {
     return -1;
 }
 
+
+/** @brief Atualiza as estruturas auxiliares ao teste de visão.
+* @details Ao receber uma nova transação, verifica se a operação é do tipo leitura
+* e, caso seja, verifica se é uma leitura limpa (sem escrita anterior sob o mesmo atributo).
+* Caso seja do tipo escrita atualiza as variáveis auxiliares descritas no arquivo header.
+*
+* @param helper Variável com as estruturas auxiliares ao teste de visão.
+* @param transaction Nova transação lida.
+*
+* @return void
+*/
 void updateHelpers(helpers_t &helper, transaction_vision_t &transaction) {
     if (transaction.operation.type == 'R' || transaction.operation.type == 'r') {
         set<char>::iterator it;
@@ -34,6 +55,19 @@ void updateHelpers(helpers_t &helper, transaction_vision_t &transaction) {
     }
 }
 
+
+/** @brief Atualiza o vetor de transações lidas.
+* @details Ao receber uma nova transação, um nodo correspondente é criado no vetor
+* de transações caso não exista e atualizado caso exista. Ainda é responsável pela
+* atualização das estruturas auxiliares ao teste de visão uma vez que a construção
+* dessas estruturas é feita conforme lê-se a entrada.
+*
+* @param helper Variável com as estruturas auxiliares ao teste de visão.
+* @param vision Vetor com todas as transações ativas.
+* @param transaction Nova transação lida.
+*
+* @return void
+*/
 void updateVision(helpers_t &helper, vector<node_vision_t> &vision, transaction_t transaction) {
     int nodeIndex = findTransactionIndex(vision, transaction.id);
 
@@ -55,6 +89,19 @@ void updateVision(helpers_t &helper, vector<node_vision_t> &vision, transaction_
     node->transactions.push_back(newTransaction);
 }
 
+
+/** @brief Indica se a escrita indicada é a última.
+* @details Verifica se uma transação subsequente à transação que invoca esta função
+* possui uma escita sob o mesmo atributo. Caso possua returna falso, indicando que
+* a transação responsável pela invocação não é a última a escrever no atributo correspondente.
+*
+* @param startIndex Index sob o qual deverá iniciar a busca por transações subsequentes.
+* @param id Identificador da transação responsável por invocar esta chamada.
+* @param writter Conjunto de transações que escreveram sob o tributo encontrado na transação invocadora.
+* @param vision Vetor perrmutado com todas as transações ativas.
+*
+* @return bool
+*/
 bool isLastWrite(int startIndex, int id, set<int>writters, vector<node_vision_t> vision) {
     int size = vision.size();
     set<int>::iterator it;
@@ -72,6 +119,18 @@ bool isLastWrite(int startIndex, int id, set<int>writters, vector<node_vision_t>
     return true;
 }
 
+
+/** @brief Indica se a escrita sobre um atributo é válida.
+* @details Para cada conjunto de transações (posição do vetor de ativas)
+* percorre cada transação até encontrar uma operação de leitura. Utiliza-se as
+* estruturas auxiliares para saber se a transação selecionada foi a última e escrever
+* sob um atributo. Retorna true caso nenhuma transação seguinte escreva sob o mesmo atributo.
+*
+* @param helper Variável com as estruturas auxiliares ao teste de visão.
+* @param vision Vetor permutado com todas as transações ativas.
+*
+* @return bool
+*/
 bool validateWrite(helpers_t helper, vector<node_vision_t> vision) {
     int size = vision.size();
 
@@ -97,6 +156,18 @@ bool validateWrite(helpers_t helper, vector<node_vision_t> vision) {
     return true;
 }
 
+
+/** @brief Indica se uma leitura limpa permanece limpa.
+* @details Para cada conjunto de transações procura por uma leitura limpa, isto é,
+* uma leitura feita sem a antecedência de uma escrita sob o mesmo atributo. Caso encontre
+* percorre todas as transações antecessoras no vetor permutado com a finalidade de garantir
+* que a leitura continua limpa e retorna verdadeiro neste caso.
+*
+* @param currentIndex Index da transação invocadora no vetor de transações ativas.
+* @param vision Vetor permutado com todas as transações ativas.
+*
+* @return bool
+*/
 bool validateCleanRead(int currentIndex, vector<node_vision_t> vision) {
     node_vision_t current = vision[currentIndex];
     vector<transaction_vision_t> transactions = current.transactions;
@@ -129,6 +200,17 @@ bool validateCleanRead(int currentIndex, vector<node_vision_t> vision) {
 }
 
 
+/** @brief Indica se as leituras feitas são válidas.
+* @details Para cada conjunto de transações procura por uma escrita. Caso encontre percorre
+* todas as transações antecessoras no vetor permutado com a finalidade de garantir que qualquer
+* leitura feita sob o mesmo atributo não devesia ser sucerro à escrita feita. Caso encontre
+* uma leitura que se enquadra no descrito, retorna false.
+*
+* @param currentIndex Index da transação invocadora no vetor de transações ativas.
+* @param vision Vetor permutado com todas as transações ativas.
+*
+* @return bool
+*/
 bool validateRead(int currentIndex, vector<node_vision_t> vision) {
     node_vision_t current = vision[currentIndex];
     vector<transaction_vision_t> transactions = current.transactions;
@@ -160,6 +242,18 @@ bool validateRead(int currentIndex, vector<node_vision_t> vision) {
     return true;
 }
 
+/** @brief Responsável por gerar as permutações possíveis.
+* @details Algoritmo de Heap responsável por gerar todas as permutações
+* possíveis a partir do vetor de entrada. Ao obter uma nova permutação,
+* ela é testada de acordo com as especifiações relativas ao teste por visão.
+* Retorna verdadeiro caso uma sequência serial válida seja encontrada.
+*
+* @param helper Variável com as estruturas auxiliares ao teste de visão.
+* @param vision Vetor com todas as transações ativa que sofrerá permutações.
+* @param size Tamanho do vetor de transações ativas a ser permutado.
+*
+* @return bool
+*/
 bool heapPermutation(helpers_t helper, vector<node_vision_t> &vision, int size) {
     if (size == 1) {
         bool validWrite = validateWrite(helper, vision);
@@ -204,11 +298,31 @@ bool heapPermutation(helpers_t helper, vector<node_vision_t> &vision, int size) 
 
 }
 
+/** @brief Responsável por indicar se as transações ativas são equivalentes.
+* @details Uma vez que todas as transações estão em um vetor no qual cada posição
+* contém todas as operações realizadas pela transação correspondente esta função
+* utiliza o algoritmo de Heap para analisar todas as permutações possíveis.
+* Caso uma sequência serial valida seja encontrada, retorna-se true.
+*
+* @param helper Variável com as estruturas auxiliares ao teste de visão.
+* @param vision Vetor com todas as transações ativas.
+*
+* @return bool
+*/
 bool isVisionEquivalent(helpers_t helper, vector<node_vision_t> vision) {
     int size = vision.size();
     return heapPermutation(helper, vision, size);
 }
 
+
+/** @brief Imprime as transações ativas em ordem crescente
+* @details Cria uma cópia com somente os identificadores presentes no vetor
+* de transações ativas, os ordena de forma crescente e imprime no stdout.
+*
+* @param vision Vetor com todas as transações ativas.
+*
+* @return void
+*/
 void printTransactionsList(vector<node_vision_t> &vision) {
     vector<int> identifiers;
     int size = vision.size();
