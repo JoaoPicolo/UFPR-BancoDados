@@ -61,11 +61,8 @@ bool isLastWrite(int startIndex, int id, set<int>writters, vector<node_vision_t>
 
     for (int i = startIndex; i < size; i++) {
         node_vision_t current = vision[i];
-        //cout << "Comeca em " << startIndex << endl;
         for(it = writters.begin(); it != writters.end(); it++) {
-            //cout << "Compara com " << (*it) << endl;
             if ((current.id == (*it)) && (id != (*it))) {
-                // cout << *it << endl;
                 return false;
             }
         }
@@ -81,21 +78,17 @@ bool validateWrite(helpers_t helper, vector<node_vision_t> vision) {
     for (int i = 0; i < size - 1; i++) {
         vector<transaction_vision_t> transactions = vision[i].transactions;
         int transactionsSize = transactions.size();
-        //cout << vision[i].id << endl;
         for (int j = 0; j < transactionsSize; j++) {
             transaction_vision_t transaction = transactions[j];
 
             if (transaction.operation.type == 'W' || transaction.operation.type == 'w') {
                 char attribute = transaction.operation.attr;
                 if (helper.lastWriter[attribute] == transaction.id) {
-                    //cout << attribute << ": ";
                     int index = findTransactionIndex(vision, transaction.id);
                     bool isLast = isLastWrite(index+1, transaction.id, helper.writters[attribute], vision);
                     if (!isLast) {
-                        //cout << "False write";
                         return false;
                     }
-                    //cout << endl;
                 }
             }
         }
@@ -114,7 +107,6 @@ bool validateCleanRead(int currentIndex, vector<node_vision_t> vision) {
 
         if (transaction.operation.type == 'R' || transaction.operation.type == 'r') {
             if (transaction.isCleanRead) {
-                //cout << "\nT1 " << transaction.id << " time " << transaction.time << endl;
                 for (int j = currentIndex-1; j >= 0; j--) {
                     node_vision_t previous = vision[j];
                     vector<transaction_vision_t> previousTransactions = previous.transactions;
@@ -122,12 +114,8 @@ bool validateCleanRead(int currentIndex, vector<node_vision_t> vision) {
                     int previousSize = previousTransactions.size();
                     for (int k = 0; k < previousSize; k++) {
                         transaction_vision_t previousTransaction = previousTransactions[k];
-                        //cout << "---> T2 " << previousTransaction.id << " time " << previousTransaction.time << " op " << previousTransaction.operation.type << endl;
                         if (previousTransaction.operation.type == 'W' || previousTransaction.operation.type == 'w') {
-                            //cout << "Eh write" << endl;
                             if (previousTransaction.operation.attr == transaction.operation.attr) {
-                                //cout << "Eh mesmo" << endl;
-                                //cout << "False valid" << endl;
                                 return false;
                             }
                         }
@@ -160,7 +148,6 @@ bool validateRead(int currentIndex, vector<node_vision_t> vision) {
                     if (previousTransaction.operation.type == 'R' || previousTransaction.operation.type == 'r') {
                         if (previousTransaction.operation.attr == transaction.operation.attr) {
                             if (previousTransaction.time > transaction.time) {
-                                //cout << "False read" << endl;
                                 return false;
                             }
                         }
@@ -175,16 +162,8 @@ bool validateRead(int currentIndex, vector<node_vision_t> vision) {
 
 bool heapPermutation(helpers_t helper, vector<node_vision_t> &vision, int size) {
     if (size == 1) {
-
-        // cout << "\n\t\t";
-        // for (auto v: vision) {
-        //     cout << v.id << " ";
-        // }
-        // cout << endl;
-
         bool validWrite = validateWrite(helper, vision);
         if (validWrite) {
-            // cout << "Valid write" << endl;
             int realSize = vision.size();
             bool validClean = true;
 
@@ -194,13 +173,11 @@ bool heapPermutation(helpers_t helper, vector<node_vision_t> &vision, int size) 
 
             if (validClean) {
                 bool validRead = true;
-                // cout << "Valid clean" << endl;
                 for (int i = 1; i < realSize; i++) {
                     validRead = validRead &&  validateRead(i, vision);
                 }
 
                 if (validRead) {
-                    // cout << "Valid read" << endl;
                     return true;
                 }
             }

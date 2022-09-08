@@ -38,32 +38,6 @@ int main() {
                 cout << " NS ";
             }
 
-            // cout << "Last writer:" << endl;
-            // for (auto l: helper.lastWriter) {
-            //     cout << l.first << ": " << l.second << endl;
-            // }
-
-            // cout << "Writters:" << endl;
-            // for (auto l: helper.writters) {
-            //     cout << l.first << ": ";
-            //     set<int> writters = l.second;
-
-            //     set<int>::iterator it;
-            //     for(it = writters.begin(); it != writters.end(); it++) {
-            //         cout << (*it) << " ";
-            //     }
-            //     cout << endl;
-            // }
-
-            // cout << "Transactions" << endl;
-            // for (auto v: vision) {
-            //     cout << v.id << endl;
-            //     vector<transaction_vision_t> trans = v.transactions;
-            //     for (auto t: trans) {
-            //         cout << t.time << " " << t.isCleanRead << endl;
-            //     }
-            // }
-
             if (isVisionEquivalent(helper, vision))  {
                 cout << "SV";
             }
