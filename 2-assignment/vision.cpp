@@ -134,7 +134,7 @@ bool isLastWrite(int startIndex, int id, set<int>writters, vector<node_vision_t>
 bool validateWrite(helpers_t helper, vector<node_vision_t> vision) {
     int size = vision.size();
 
-    for (int i = 0; i < size - 1; i++) {
+    for (int i = 0; i < size; i++) {
         vector<transaction_vision_t> transactions = vision[i].transactions;
         int transactionsSize = transactions.size();
         for (int j = 0; j < transactionsSize; j++) {
