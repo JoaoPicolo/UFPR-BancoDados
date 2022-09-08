@@ -1,6 +1,6 @@
-#include <bits/stdc++.h>
-#include "graph.hpp"
-
+#include "utils.hpp"
+#include "vision.hpp"
+#include "conflict.hpp"
 
 int main() {
     cin.tie(0);
@@ -10,55 +10,37 @@ int main() {
     char operation, attribute;
 
 
-    // Lista de adjacência para construção do grafo
-    vector<nodo_t> adj;
-    vector<nodo_visao_t> visao;
-    vector<attribut_t> attributes;
+    vector<node_vision_t> vision;
+    vector<attribute_t> attributes;
+    vector<node_conflict_t> adjacencies;
 
-    int count = 1;
+    int counter = 1;
+    bool endedTransactions = false;
     while (scanf("%d %d %c %c", &arrival_time, &identifier, &operation, &attribute) != EOF) {
-        transaction_t tx = createTransaction(arrival_time, identifier, operation, attribute);
-        updateAttr(attributes, tx);
-        bool finished = updateAdj(adj, tx);
-        updateVisao(visao, tx);
+        transaction_t transaction = createTransaction(arrival_time, identifier, operation, attribute);
 
-        if (finished) {
+        updateConflict(adjacencies, transaction);
 
-            cout << count << " ";
+        updateVision(vision, transaction);
+        updateAttributes(attributes, transaction);
 
-            vector<int> idsTx;
-            int size = visao.size();
-            for (int i = 0; i < size; i++) {
-                idsTx.push_back(visao[i].id);
-            }
+        if ((operation == 'C') || (operation == 'c')) {
+            endedTransactions = transactionsClosed(adjacencies);
+        }
 
+        if (endedTransactions) {
+            cout << counter << " ";
 
-            // for (auto a: adj) {
-            //     cout << a.id << ": ";
-            //     set<int> l = a.adjTx;
-            //     for (auto it = l.begin(); it != l.end(); ++it)
-            //         cout << ' ' << *it;
-            //     cout << endl;
-            // }
+            printTransactionsList(vision);
 
-
-            sort(idsTx.begin(), idsTx.end());
-            for (int i = 0; i < size; i++) {
-                cout << idsTx[i];
-
-                if (i < size - 1) {
-                    cout << ",";
-                }
-            }
-
-            if (hasCycle(adj)) {
-                cout << " NS ";
-            }
-            else {
+            if (!hasCycle(adjacencies)) {
                 cout << " SS ";
             }
+            else {
+                cout << " NS ";
+            }
 
-            if (visaoEq(visao, attributes))  {
+            if (isVisionEquivalent(vision, attributes))  {
                 cout << "SV";
             }
             else {
@@ -67,9 +49,11 @@ int main() {
             
             cout << endl;
 
-            count++;
-            adj.clear();
-            visao.clear();
+            counter++;
+            endedTransactions = false;
+
+            vision.clear();
+            adjacencies.clear();
         }
     }
 }
