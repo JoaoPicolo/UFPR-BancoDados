@@ -55,14 +55,14 @@ int main() {
             //     cout << endl;
             // }
 
-            cout << "Transactions" << endl;
-            for (auto v: vision) {
-                cout << v.id << endl;
-                vector<transaction_vision_t> trans = v.transactions;
-                for (auto t: trans) {
-                    cout << t.time << " " << t.isCleanRead << endl;
-                }
-            }
+            // cout << "Transactions" << endl;
+            // for (auto v: vision) {
+            //     cout << v.id << endl;
+            //     vector<transaction_vision_t> trans = v.transactions;
+            //     for (auto t: trans) {
+            //         cout << t.time << " " << t.isCleanRead << endl;
+            //     }
+            // }
 
             if (isVisionEquivalent(helper, vision))  {
                 cout << "SV";

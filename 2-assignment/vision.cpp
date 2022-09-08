@@ -107,17 +107,19 @@ bool validateCleanRead(int currentIndex, vector<node_vision_t> vision) {
 
         if (transaction.operation.type == 'R' || transaction.operation.type == 'r') {
             if (transaction.isCleanRead) {
-                //cout << "Will validate " << transaction.time << " from " << transaction.id << endl;
-
+                //cout << "\nT1 " << transaction.id << " time " << transaction.time << endl;
                 for (int j = currentIndex-1; j >= 0; j--) {
                     node_vision_t previous = vision[j];
                     vector<transaction_vision_t> previousTransactions = previous.transactions;
 
                     int previousSize = previousTransactions.size();
                     for (int k = 0; k < previousSize; k++) {
-                        transaction_vision_t previousTransaction = previousTransactions[i];
+                        transaction_vision_t previousTransaction = previousTransactions[k];
+                        //cout << "---> T2 " << previousTransaction.id << " time " << previousTransaction.time << " op " << previousTransaction.operation.type << endl;
                         if (previousTransaction.operation.type == 'W' || previousTransaction.operation.type == 'w') {
+                            //cout << "Eh write" << endl;
                             if (previousTransaction.operation.attr == transaction.operation.attr) {
+                                //cout << "Eh mesmo" << endl;
                                 return false;
                             }
                         }
@@ -131,30 +133,28 @@ bool validateCleanRead(int currentIndex, vector<node_vision_t> vision) {
 }
 
 
-bool validateRead(vector<transaction_vision_t> fstTransactions, vector<transaction_vision_t> scdTransactions) {
-    int fstSize = fstTransactions.size();
-    int scdSize = scdTransactions.size();
+bool validateRead(int currentIndex, vector<node_vision_t> vision) {
+    node_vision_t current = vision[currentIndex];
+    vector<transaction_vision_t> transactions = current.transactions;
 
-    for (int i = 0; i < fstSize; i++) {
-        transaction_vision_t fstTransaction = fstTransactions[i];
+    int size = transactions.size();
+    for (int i = 0; i < size; i++) {
+        transaction_vision_t transaction = transactions[i];
 
-        cout << fstTransaction.id << " " << fstTransaction.time << " " << fstTransaction.operation.type << endl;
+        if (transaction.operation.type == 'W' || transaction.operation.type == 'w') {
+            for (int j = currentIndex-1; j >= 0; j--) {
+                node_vision_t previous = vision[j];
+                vector<transaction_vision_t> previousTransactions = previous.transactions;
 
-        for (int j = 0; j < scdSize; j++) {
-            transaction_vision_t scdTransaction = scdTransactions[j];
-            cout << "---> " << scdTransaction.id << " " << scdTransaction.time << " " << scdTransaction.operation.type << endl;
-
-            if (fstTransaction.operation.attr == scdTransaction.operation.attr) {
-                if (
-                    (fstTransaction.operation.type == 'R' || fstTransaction.operation.type == 'r') &&
-                    (scdTransaction.operation.type == 'W' || scdTransaction.operation.type == 'w')
-                ) {
-                    if (fstTransaction.time < scdTransaction.time) {
-                        return true;
-                    }
-                    else {
-                        
-                        return false;
+                int previousSize = previousTransactions.size();
+                for (int k = 0; k < previousSize; k++) {
+                    transaction_vision_t previousTransaction = previousTransactions[k];
+                    if (previousTransaction.operation.type == 'R' || previousTransaction.operation.type == 'r') {
+                        if (previousTransaction.operation.attr == transaction.operation.attr) {
+                            if (previousTransaction.time > transaction.time) {
+                                return false;
+                            }
+                        }
                     }
                 }
             }
@@ -167,14 +167,15 @@ bool validateRead(vector<transaction_vision_t> fstTransactions, vector<transacti
 bool heapPermutation(helpers_t helper, vector<node_vision_t> &vision, int size) {
     if (size == 1) {
 
-        for (auto v: vision) {
-            cout << v.id << " ";
-        }
-        cout << endl;
+        // cout << "\n\t\t";
+        // for (auto v: vision) {
+        //     cout << v.id << " ";
+        // }
+        // cout << endl;
 
         bool validWrite = validateWrite(helper, vision);
         if (validWrite) {
-            cout << "Valid write" << endl;
+            // cout << "Valid write" << endl;
             int realSize = vision.size();
             bool validClean = true;
 
@@ -184,12 +185,14 @@ bool heapPermutation(helpers_t helper, vector<node_vision_t> &vision, int size) 
 
             if (validClean) {
                 bool validRead = true;
-                cout << "Valid clean" << endl;
-                for (int i = 0; i < realSize - 1; i++) {
-                    bool isValid = validRead &&  validateRead(vision[i].transactions, vision[i+1].transactions);
-                    if (isValid) {
-                        return true;
-                    }
+                // cout << "Valid clean" << endl;
+                for (int i = 1; i < realSize; i++) {
+                    validRead = validRead &&  validateRead(i, vision);
+                }
+
+                if (validRead) {
+                    // cout << "Valid read" << endl;
+                    return true;
                 }
             }
         }
